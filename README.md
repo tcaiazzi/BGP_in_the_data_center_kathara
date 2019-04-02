@@ -36,3 +36,4 @@ num_spine = 2 #number of spines
 ```
 After, you'll need to run create_lab.py.
 
+N.B. : we test only configuration with an even number of leaves and spines
