@@ -1,6 +1,6 @@
 import os , sys
 import string
-num_leafs = 4
+num_leaves = 4
 num_server_pod = 2
 num_spine = 2
 # 0 and 1 for connection 
@@ -28,7 +28,7 @@ def write_leaf_spine(lab,lab_unsort,port_for_spine,port_for_leaf,current_id,spin
     lab_unsort.write("leaf0"+str(leaf_number)+"["+str(port_for_spine)+"]=\""+current_id+"\"\n")
     lab_unsort.write("spine0"+str(spine_number)+"["+str(port_for_leaf)+"]=\""+current_id+"\"\n")
 
-def connect_leafs(lab,lab_unsort,leaf_number,current_id):
+def connect_leaves(lab,lab_unsort,leaf_number,current_id):
     current_id = get_lan()
     lab.write("leaf0"+str(leaf_number)+"[0]=\""+current_id+"\"\n")
     lab.write("leaf0"+str(leaf_number+1)+"[0]=\""+current_id+"\"\n")
@@ -83,7 +83,7 @@ def build_lab_conf( ):
     
     for i in range(num_spine):
         lab.write("spine0"+str(i+1)+"[image]=frr \n")
-        for j in range(num_leafs): 
+        for j in range(num_leaves): 
             write_leaf_spine(lab,
                              lab_unsort,
                              port_for_spine,
@@ -96,17 +96,17 @@ def build_lab_conf( ):
         port_for_leaf = 2 
         port_for_spine +=1
 
-    num_pair_to_connect = num_leafs/2
+    num_pair_to_connect = num_leaves/2
     start_id = 0
     for i in range (int(num_pair_to_connect)):
-        connect_leafs(lab,
+        connect_leaves(lab,
                       lab_unsort,
                       start_id+1,
                       current_id)
         start_id+=2
 
     num_build_server = 0
-    for j in range(int(num_leafs/2)):
+    for j in range(int(num_leaves/2)):
         port_for_server = port_for_spine
         for k in range(num_server_pod):
             connect_server_to_leaf(lab,

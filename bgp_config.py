@@ -3,7 +3,7 @@ import re
 import shutil
 import build_net
 
-num_leafs = build_net.num_leafs
+num_leaves = build_net.num_leaves
 num_server_pod=build_net.num_server_pod
 num_spine=build_net.num_spine
 
@@ -76,7 +76,7 @@ def write_spine_bgpd(spine_name):
         + " neighbor ISL timers connect 5\n"
     )
     i = 2
-    for i in range(2, num_leafs + 2):
+    for i in range(2, num_leaves + 2):
         bgpd_conf.write(
           " neighbor eth"+ str(i) + " interface peer-group ISL\n"  
         )
@@ -164,9 +164,9 @@ def write_all_config():
     for i in range(1, num_spine+1):
         write_spine_bgpd("spine0"+str(i))
 
-    for i in range(1, num_leafs+1): 
+    for i in range(1, num_leaves+1): 
         write_leaf_bgpd("leaf0"+str(i))
 
-    number_of_server = num_server_pod * int((num_leafs/2))
+    number_of_server = num_server_pod * int((num_leaves/2))
     for i in range(1, number_of_server+1):     
         write_server_bgpd("server0"+str(i))

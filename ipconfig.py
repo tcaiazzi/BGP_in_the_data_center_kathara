@@ -16,8 +16,8 @@ clos_net = Network(height="100%", width="100%",bgcolor="#222222", font_color="wh
 
 initial_x_server = 200
 initial_y_server = 650
-initial_x_leafs = 200
-initial_y_leafs = 450
+initial_x_leaves = 200
+initial_y_leaves = 450
 initial_x_spine = 400
 initial_y_spine = 0
 
@@ -32,13 +32,13 @@ def list_exists(node_id, nodes):
 
 def set_positions(name_n, position_list):
     global initial_x_server, initial_y_server 
-    global initial_x_leafs, initial_y_leafs
+    global initial_x_leaves, initial_y_leaves
     global initial_x_spine, initial_y_spine
    
     
     if re.search("leaf",  name_n):
-        initial_x_leafs += 150
-        position_list[name_n] = (initial_x_leafs,initial_y_leafs)
+        initial_x_leaves += 150
+        position_list[name_n] = (initial_x_leaves,initial_y_leaves)
     elif re.search("spine",  name_n): 
         number = int(re.split('spine0|\[|\]=.*', name_n)[1]) 
         
