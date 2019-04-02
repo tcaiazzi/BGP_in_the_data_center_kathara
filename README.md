@@ -7,10 +7,14 @@ To run the example lab in this repository, you'll need katharà:
  
 https://github.com/KatharaFramework/Kathara
 
+You need to build the docker image for katharà containers. Open the lab folder in a terminal and type: 
 
+```
+$ docker build -t kathara/frr .
 
+```
 ## Run the lab
-To run the lab type on terminal: 
+To run the lab, type on terminal: 
 
 ```
 $ python3 create_lab.py
@@ -18,7 +22,7 @@ $ lstart
 
 ```
 
-To run the lab typing on terminal: 
+To stop the lab, type on terminal: 
 
 ```
 $ lclean
@@ -36,4 +40,4 @@ num_spine = 2 #number of spines
 ```
 After, you'll need to run create_lab.py.
 
-N.B. : we test only configuration with an even number of leaves and spines
+N.B. : we test only configuration with an even number of leaves and spines. 
