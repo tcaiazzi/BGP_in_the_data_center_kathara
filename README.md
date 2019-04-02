@@ -10,7 +10,7 @@ https://github.com/KatharaFramework/Kathara
 
 
 ## Run the lab
-To run the lab typing on terminal: 
+To run the lab type on terminal: 
 
 ```
 $ python3 create_lab.py
