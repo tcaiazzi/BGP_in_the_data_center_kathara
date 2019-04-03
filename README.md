@@ -13,6 +13,12 @@ You need to build the docker image for katharà containers. Open the lab folder 
 $ docker build -t kathara/frr .
 
 ```
+You also need the pyvis lib for python3. To download it open a terminal and type: 
+
+```
+$ python3 -m pip install pyvis
+
+```
 
 ## Run the lab
 To run the lab, type on terminal: 
