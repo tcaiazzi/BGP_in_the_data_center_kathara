@@ -13,6 +13,7 @@ You need to build the docker image for katharà containers. Open the lab folder 
 $ docker build -t kathara/frr .
 
 ```
+
 ## Run the lab
 To run the lab, type on terminal: 
 

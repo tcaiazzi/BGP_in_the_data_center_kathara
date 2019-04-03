@@ -13,7 +13,7 @@ clos_net = Network(height="100%", width="100%",bgcolor="#222222", font_color="wh
 # set the physics layout of the network
 
 
-
+# inital positions for the nodes of the graph 
 initial_x_server = 200
 initial_y_server = 650
 initial_x_leaves = 200
@@ -24,13 +24,15 @@ initial_y_spine = 0
 
 net = {}
 
+
 def list_exists(node_id, nodes):
     for node in nodes: 
         if node_id == node["id"]:
             return node  
     return None  
 
-def set_positions(name_n, position_list):
+# set the positions of the node (name_n) and puts it in positions_list
+def set_positions(name_n, positions_list):
     global initial_x_server, initial_y_server 
     global initial_x_leaves, initial_y_leaves
     global initial_x_spine, initial_y_spine
@@ -38,7 +40,7 @@ def set_positions(name_n, position_list):
     
     if re.search("leaf",  name_n):
         initial_x_leaves += 150
-        position_list[name_n] = (initial_x_leaves,initial_y_leaves)
+        positions_list[name_n] = (initial_x_leaves,initial_y_leaves)
     elif re.search("spine",  name_n): 
         number = int(re.split('spine0|\[|\]=.*', name_n)[1]) 
         
@@ -48,12 +50,13 @@ def set_positions(name_n, position_list):
             initial_x_spine += 150
         
         
-        position_list[name_n] = (initial_x_spine,initial_y_spine)
+        positions_list[name_n] = (initial_x_spine,initial_y_spine)
     else :
         initial_x_server += 150
-        position_list[name_n] = (initial_x_server,initial_y_server)
-        curr_posx1,curr_posy1 = position_list[name_n]
+        positions_list[name_n] = (initial_x_server,initial_y_server)
+        curr_posx1,curr_posy1 = positions_list[name_n]
 
+# returns two free ip addresses and their lan
 def get_ip(): 
     global prefix
     ip1 = "10.0.0."+str(prefix+1)+"/30"
@@ -61,7 +64,8 @@ def get_ip():
     lan = "10.0.0."+str(prefix)+"/30"
     prefix += 4
     return ip1, ip2, lan
-        
+
+# returns the node (name) image for the graph
 def get_image(name):
     if re.search("server",  name):
         image = "file:///"+path+"/image/server.png"
@@ -71,7 +75,7 @@ def get_image(name):
         image = "file:///"+path+"/image/leaf.png"
     return image
 
-
+# reads the lab_unsort.conf file and writes all the .startup files
 def ipconfig():
     for item in files:
         if item.endswith(".startup"):
@@ -83,7 +87,7 @@ def ipconfig():
         line2 = fp.readline().strip()
         
         cnt = 2
-        position_list = {}
+        positions_list = {}
         while line1 and line2:
 
 
@@ -105,8 +109,8 @@ def ipconfig():
                     #node1["title"] += eth_n1 + ": "+ ip1 + " to " + name_n2 + "<br>"
                 else: 
                     net[name_n1] = [eth_n1 + ": "+ ip1 + " to " + name_n2 + "<br>"]
-                    set_positions(name_n1, position_list)
-                    curr_posx1,curr_posy1 = position_list[name_n1]
+                    set_positions(name_n1, positions_list)
+                    curr_posx1,curr_posy1 = positions_list[name_n1]
                     image = get_image(name_n1)
                     clos_net.add_node(name_n1,name_n1,title=name_n1+" neighbors:<br><br>",shape="image", physics=False, x=curr_posx1, y=curr_posy1 ,image=image)                                                                                                                                                                                               
 
@@ -115,8 +119,8 @@ def ipconfig():
                     #node2["title"] += eth_n2 + ": "+ ip2 + " to " + name_n1 + "<br>"
                 else: 
                     net[name_n2] = [eth_n2 + ": "+ ip2 + " to " + name_n1 + "<br>"]
-                    set_positions(name_n2, position_list)
-                    curr_posx2,curr_posy2 = position_list[name_n2]
+                    set_positions(name_n2, positions_list)
+                    curr_posx2,curr_posy2 = positions_list[name_n2]
                     image = get_image(name_n2)
                     clos_net.add_node(name_n2,name_n2,title=name_n2+" neighbors:<br><br>",shape="image",physics=False, x=curr_posx2, y=curr_posy2,image=image)
                 

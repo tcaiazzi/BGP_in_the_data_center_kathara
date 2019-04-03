@@ -1,12 +1,14 @@
 import os , sys
 import string
-num_leaves = 4
-num_server_pod = 2
-num_spine = 2
+num_leaves = 4  #number of leaves 
+num_server_pod = 2 #number of server per pod (a pod is made by two leaves)
+num_spine = 2 #number of spine
 # 0 and 1 for connection 
 start_port = 2
 current_id = "@"
 number = 0
+
+#This module is used to build the lab.conf file
 
 def get_lan():
     global number
@@ -19,7 +21,8 @@ def get_lan():
         asci_int += 1
     current_id = chr(asci_int)
     return chr(asci_int)+str(number)
-   
+
+# attaches in lab.conf a leaf to a spine
 def write_leaf_spine(lab,lab_unsort,port_for_spine,port_for_leaf,current_id,spine_number,leaf_number):
 
     current_id = get_lan()
@@ -28,6 +31,7 @@ def write_leaf_spine(lab,lab_unsort,port_for_spine,port_for_leaf,current_id,spin
     lab_unsort.write("leaf0"+str(leaf_number)+"["+str(port_for_spine)+"]=\""+current_id+"\"\n")
     lab_unsort.write("spine0"+str(spine_number)+"["+str(port_for_leaf)+"]=\""+current_id+"\"\n")
 
+# attaches two leaves (leaf_number and leaf_number+1)
 def connect_leaves(lab,lab_unsort,leaf_number,current_id):
     current_id = get_lan()
     lab.write("leaf0"+str(leaf_number)+"[0]=\""+current_id+"\"\n")
@@ -41,20 +45,22 @@ def connect_leaves(lab,lab_unsort,leaf_number,current_id):
     lab_unsort.write("leaf0"+str(leaf_number)+"[1]=\""+current_id+"\"\n")
     lab_unsort.write("leaf0"+str(leaf_number+1)+"[1]=\""+current_id+"\"\n")
 
-def connect_server_to_leaf(lab,lab_unsort,server_number,num_pods,current_id,port_for_server):
+# connects a server (server_number) to a pair of leaves (leaf_number and leaf_number+1) on leaf_interface
+def connect_server_to_leaf(lab,lab_unsort,server_number,leaf_number,current_id,leaf_interface):
     current_id = get_lan()
     lab.write("server0"+str(server_number)+"[0]=\""+current_id+"\"\n")
     lab.write("server0"+str(server_number)+"[image]=frr\n")
-    lab.write("leaf0"+str(num_pods)+"["+str(port_for_server)+"]=\""+current_id+"\"\n")
-    lab_unsort.write("leaf0"+str(num_pods)+"["+str(port_for_server)+"]=\""+current_id+"\"\n")
+    lab.write("leaf0"+str(leaf_number)+"["+str(leaf_interface)+"]=\""+current_id+"\"\n")
+    lab_unsort.write("leaf0"+str(leaf_number)+"["+str(leaf_interface)+"]=\""+current_id+"\"\n")
     lab_unsort.write("server0"+str(server_number)+"[0]=\""+current_id+"\"\n")
 
     current_id = get_lan()
     lab.write("server0"+str(server_number)+"[1]=\""+current_id+"\"\n")
-    lab.write("leaf0"+str(num_pods+1)+"["+str(port_for_server)+"]=\""+current_id+"\"\n")
+    lab.write("leaf0"+str(leaf_number+1)+"["+str(leaf_interface)+"]=\""+current_id+"\"\n")
     lab_unsort.write("server0"+str(server_number)+"[1]=\""+current_id+"\"\n")
-    lab_unsort.write("leaf0"+str(num_pods+1)+"["+str(port_for_server)+"]=\""+current_id+"\"\n")
+    lab_unsort.write("leaf0"+str(leaf_number+1)+"["+str(leaf_interface)+"]=\""+current_id+"\"\n")
 
+# connects two spine each other (spine_number and spine_number + 1)
 def connect_spine_to_spine(lab,lab_unsort,spine_number,current_id):
     current_id = get_lan()
     lab.write("spine0"+str(spine_number)+"[0]=\""+current_id+"\"\n")
@@ -67,7 +73,8 @@ def connect_spine_to_spine(lab,lab_unsort,spine_number,current_id):
     lab.write("spine0"+str(spine_number+1)+"[1]=\""+current_id+"\"\n")
     lab_unsort.write("spine0"+str(spine_number)+"[1]=\""+current_id+"\"\n")
     lab_unsort.write("spine0"+str(spine_number+1)+"[1]=\""+current_id+"\"\n")
-       
+
+ # writes the lab.conf file    
 def build_lab_conf( ):
     global current_id
     lab  = open("lab.conf","w",)

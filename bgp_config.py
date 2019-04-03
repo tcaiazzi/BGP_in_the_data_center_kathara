@@ -7,14 +7,17 @@ num_leaves = build_net.num_leaves
 num_server_pod=build_net.num_server_pod
 num_spine=build_net.num_spine
 
-spine_asn = 65499
-leaf_asn = 64999
-server_asn = 0
 
+spine_asn = 65499 #starting asn number for spines (the first is 65500)
+leaf_asn = 64999 #starting asn number for leaves (the first is 65000)
+server_asn = 0 #starting asn number for servers (the first is 1)
+
+# variables used to assign router_id
 spine_id=1
 leaf_id=1
 server_id=1
 
+# returns a free asn number for the node type of node (node_name)
 def get_asn(node_name):
     global spine_asn
     global leaf_asn
@@ -32,7 +35,7 @@ def get_asn(node_name):
         asn = server_asn
     return asn
 
-
+# creates all the directory needed in the lab by frr and bgp 
 def create_dir():
     files = os.listdir('.')
     for item in files:
@@ -60,7 +63,7 @@ def create_dir():
                 + "enable password frr\n"
             )
 
-
+# writes the spine (spine_name) bgpd.conf file
 def write_spine_bgpd(spine_name):
     global spine_id
     bgpd_conf=open(spine_name+"/etc/frr/bgpd.conf", "a")
@@ -90,6 +93,7 @@ def write_spine_bgpd(spine_name):
     )
     spine_id+=1
 
+# writes the leaf (leaf_name) bgpd.conf file
 def write_leaf_bgpd(leaf_name):
     global leaf_id
     bgpd_conf=open(leaf_name+"/etc/frr/bgpd.conf", "a")
@@ -130,7 +134,7 @@ def write_leaf_bgpd(leaf_name):
     )
     leaf_id+=1
 
-
+# writes the server (server_name) bgpd.conf file
 def write_server_bgpd(server_name):
     global server_id
     bgpd_conf=open(server_name+"/etc/frr/bgpd.conf", "a")
@@ -159,6 +163,7 @@ def write_server_bgpd(server_name):
     )
     server_id+=1
 
+# writes all the bgpd.conf files
 def write_all_config(): 
     create_dir()
     for i in range(1, num_spine+1):
