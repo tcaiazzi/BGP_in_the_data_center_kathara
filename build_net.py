@@ -1,8 +1,11 @@
 import os , sys
 import string
+
+
 num_leaves = 4  #number of leaves 
 num_server_pod = 2 #number of server per pod (a pod is made by two leaves)
 num_spine = 2 #number of spine
+
 # 0 and 1 for connection 
 start_port = 2
 current_id = "@"
@@ -79,7 +82,7 @@ def build_lab_conf( ):
     global current_id
     lab  = open("lab.conf","w",)
     lab_unsort = open("lab_unsort.conf","w",)
-    num_leaf = 0 
+    
     if( num_spine%2 == 0 ):
         port_for_leaf = 2
     else: 

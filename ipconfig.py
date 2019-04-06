@@ -54,7 +54,7 @@ def set_positions(name_n, positions_list):
     else :
         initial_x_server += 150
         positions_list[name_n] = (initial_x_server,initial_y_server)
-        curr_posx1,curr_posy1 = positions_list[name_n]
+        
 
 # returns two free ip addresses and their lan
 def get_ip(): 
@@ -81,7 +81,7 @@ def ipconfig():
         if item.endswith(".startup"):
             os.remove( item )
 
-    prefix=0
+   
     with open(filepath) as fp:  
         line1 = fp.readline().strip()
         line2 = fp.readline().strip()
