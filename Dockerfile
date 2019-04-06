@@ -12,7 +12,18 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
     lsb-release \
     nano \
     net-tools \
-    traceroute
+    traceroute \
+    paris-traceroute \
+    dublin-traceroute \
+    tcpdump \
+    bind9 \
+    dnsutils \
+    git \
+    tar \
+    wget \
+    vim  
+
+
 
 RUN curl -s https://deb.frrouting.org/frr/keys.asc | apt-key add -   
    

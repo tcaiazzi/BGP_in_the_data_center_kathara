@@ -42,7 +42,7 @@ def set_positions(name_n, positions_list):
         initial_x_leaves += 150
         positions_list[name_n] = (initial_x_leaves,initial_y_leaves)
     elif re.search("spine",  name_n): 
-        number = int(re.split('spine0|\[|\]=.*', name_n)[1]) 
+        number = int(re.split('spine|\[|\]=.*', name_n)[1]) 
         
         if number > 2 and number % 2 == 1: 
             initial_x_spine +=  350

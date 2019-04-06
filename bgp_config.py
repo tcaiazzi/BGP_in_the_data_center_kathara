@@ -47,7 +47,8 @@ def create_dir():
     for item in files:
         if item.endswith(".startup"):
             startup = open(item, "a")
-            startup.write("/etc/init.d/frr start")
+            startup.write("/etc/init.d/frr start\n")
+            startup.write("sysctl -w net.ipv4.fib_multipath_hash_policy=1")  #to enable ipv4 multipath 
             name = re.split('\.startup', item)[0]
             print(name)
             os.mkdir(name)
@@ -167,11 +168,11 @@ def write_server_bgpd(server_name):
 def write_all_config(): 
     create_dir()
     for i in range(1, num_spine+1):
-        write_spine_bgpd("spine0"+str(i))
+        write_spine_bgpd("spine"+str(i))
 
     for i in range(1, num_leaves+1): 
-        write_leaf_bgpd("leaf0"+str(i))
+        write_leaf_bgpd("leaf"+str(i))
 
     number_of_server = num_server_pod * int((num_leaves/2))
     for i in range(1, number_of_server+1):     
-        write_server_bgpd("server0"+str(i))
+        write_server_bgpd("server"+str(i))
