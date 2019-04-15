@@ -29,7 +29,7 @@ $ lstart
 
 ```
 The create_lab.py creates the configuration files for nodes and the network graph (clos.html).
-You can open the clos.html file to check the network topology and the ip configuration.
+You can open the clos.html file in a browser to check the network topology and the ip configuration.
 
 To stop the lab, type on terminal: 
 
