@@ -79,8 +79,9 @@ def connect_spine_to_spine(lab,lab_unsort,spine_number,current_id):
 
  # writes the lab.conf file    
 def build_lab_conf( ):
+    print("Building the lab configuration ...")
     global current_id
-    lab  = open("lab.conf","w",)
+    lab  = open("lab.conf","w")
     lab_unsort = open("lab_unsort.conf","w",)
     
     if( num_spine%2 == 0 ):
@@ -137,10 +138,13 @@ def build_lab_conf( ):
                                num_spine_to_connect+1,
                                current_id)
         num_spine_to_connect += 2
+    lab.close()
+    lab_unsort.close()
 
-    data=open("lab.conf").readlines()
+    data=open("lab.conf", "r+").readlines()
     data.sort()
-    lab  = open("lab.conf","w",)
+    lab  = open("lab.conf","w")
     for i in range(len(data)):
         lab.write(data[i])
+    lab.close()
 

@@ -77,6 +77,7 @@ def get_image(name):
 
 # reads the lab_unsort.conf file and writes all the .startup files
 def ipconfig():
+    print("Configuring the IPs and drawing the graph...")
     for item in files:
         if item.endswith(".startup"):
             os.remove( item )
