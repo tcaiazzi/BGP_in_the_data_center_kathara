@@ -126,7 +126,7 @@ Displayed  22 routes and 38 total paths
 
 ```
 
-You can notice that bgp multipath is working (the '=' means that the routes to the target are equals), so the control plane works correctly. 
+You can notice that bgp multipath is working (the '=' means that the routes to the target have the same cost), so the control plane works correctly. 
 If you want to check that also the data plane detects multipath routes, type on spine1 terminal (outside the bgp daemon): 
 
 ```
@@ -135,3 +135,4 @@ root@spine1:/# ip route show 10.0.0.40/30
         nexthop via 10.0.0.9 dev eth4 weight 1 
         nexthop via 10.0.0.13 dev eth5 weight 1 
 ```
+
