@@ -6,7 +6,7 @@ import build_net
 num_leaves = build_net.num_leaves
 num_server_pod=build_net.num_server_pod
 num_spine=build_net.num_spine
-
+num_exit = build_net.num_exit
 
 spine_asn = 65499 #starting asn number for spines (the first is 65500)
 leaf_asn = 64999 #starting asn number for leaves (the first is 65000)
@@ -26,7 +26,7 @@ def get_asn(node_name):
     asn = None
     if re.search('spine', node_name):
         asn = spine_asn
-    elif re.search('leaf', node_name): 
+    elif re.search('leaf|exit', node_name): 
         leaf_asn += 1
         asn = leaf_asn
     elif re.search('server', node_name): 
@@ -85,7 +85,7 @@ def write_spine_bgpd(spine_name):
         + " neighbor fabric timers connect 5\n"
     )
     i = 2
-    for i in range(2, num_leaves + 2):
+    for i in range(2, num_leaves + 2 + num_exit):
         bgpd_conf.write(
           " neighbor eth"+ str(i) + " interface peer-group fabric\n"  
         )
@@ -142,6 +142,38 @@ def write_leaf_bgpd(leaf_name):
     leaf_id+=1
     bgpd_conf.close()
 
+
+# writes the exit (exit_name) bgpd.conf file
+def write_exit_bgpd(exit_name):
+    global leaf_id
+    bgpd_conf=open(exit_name+"/etc/frr/bgpd.conf", "a")
+    asn = get_asn(exit_name)
+    bgpd_conf.write(
+        "router bgp " + str(asn) + "\n"
+        + " timers bgp 3 9\n" 
+        + " bgp router-id 10.0.254." + str(leaf_id) +"\n"
+        + " bgp bestpath as-path multipath-relax\n"
+        + " bgp bestpath compare-routerid\n"
+        + " neighbor fabric peer-group\n"
+        + " neighbor fabric remote-as external\n"
+        + " neighbor fabric advertisement-interval 0\n"
+        + " neighbor fabric timers connect 5\n"
+    )
+    i = 2
+    for i in range(2, num_spine + 2):
+        bgpd_conf.write(
+          " neighbor eth"+ str(i) + " interface peer-group fabric\n"  
+        )
+    bgpd_conf.write(
+        " address-family ipv4 unicast\n"
+        + "  neighbor fabric activate\n"
+        + "  redistribute connected\n" 
+        + "  maximum-paths 64\n"
+        + " exit-address-family\n"
+    )
+    leaf_id+=1
+    bgpd_conf.close()
+
 # writes the server (server_name) bgpd.conf file
 def write_server_bgpd(server_name):
     global server_id
@@ -182,6 +214,10 @@ def write_all_config():
     for i in range(1, num_leaves+1): 
         write_leaf_bgpd("leaf"+str(i))
 
+    for i in range(1, num_exit+1): 
+        write_exit_bgpd("exit"+str(i))
+
     number_of_server = num_server_pod * int((num_leaves/2))
     for i in range(1, number_of_server+1):     
         write_server_bgpd("server"+str(i))
+    

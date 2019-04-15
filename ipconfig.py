@@ -20,7 +20,8 @@ initial_x_leaves = 200
 initial_y_leaves = 450
 initial_x_spine = 400
 initial_y_spine = 0
-
+initial_x_exit = initial_x_spine
+initial_y_exit = -200
 
 net = {}
 
@@ -36,7 +37,7 @@ def set_positions(name_n, positions_list):
     global initial_x_server, initial_y_server 
     global initial_x_leaves, initial_y_leaves
     global initial_x_spine, initial_y_spine
-   
+    global initial_x_exit, initial_y_exit
     
     if re.search("leaf",  name_n):
         initial_x_leaves += 150
@@ -51,9 +52,12 @@ def set_positions(name_n, positions_list):
         
         
         positions_list[name_n] = (initial_x_spine,initial_y_spine)
-    else :
+    elif re.search("server", name_n) :
         initial_x_server += 150
         positions_list[name_n] = (initial_x_server,initial_y_server)
+    elif re.search("exit", name_n): 
+        initial_x_exit +=  150
+        positions_list[name_n] = (initial_x_exit, initial_y_exit)
         
 
 # returns two free ip addresses and their lan
@@ -73,6 +77,8 @@ def get_image(name):
         image = "file:///"+path+"/image/spine.png"
     elif re.search("leaf", name):
         image = "file:///"+path+"/image/leaf.png"
+    elif re.search("exit", name):
+        image = "file:///"+path+"/image/exit.png"
     return image
 
 # reads the lab_unsort.conf file and writes all the .startup files

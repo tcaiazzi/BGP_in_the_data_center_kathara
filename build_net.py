@@ -5,6 +5,7 @@ import string
 num_leaves = 4  #number of leaves 
 num_server_pod = 2 #number of server per pod (a pod is made by two leaves)
 num_spine = 2 #number of spine
+num_exit = 2
 
 # 0 and 1 for connection 
 start_port = 2
@@ -26,7 +27,7 @@ def get_lan():
     return chr(asci_int)+str(number)
 
 # attaches in lab.conf a leaf to a spine
-def write_leaf_spine(lab,lab_unsort,port_for_spine,port_for_leaf,current_id,spine_number,leaf_number):
+def connect_leaf_to_spine(lab,lab_unsort,port_for_spine,port_for_leaf,current_id,spine_number,leaf_number):
 
     current_id = get_lan()
     lab.write("leaf"+str(leaf_number)+"["+str(port_for_spine)+"]=\""+current_id+"\"\n")
@@ -76,6 +77,28 @@ def connect_spine_to_spine(lab,lab_unsort,spine_number,current_id):
     lab.write("spine"+str(spine_number+1)+"[1]=\""+current_id+"\"\n")
     lab_unsort.write("spine"+str(spine_number)+"[1]=\""+current_id+"\"\n")
     lab_unsort.write("spine"+str(spine_number+1)+"[1]=\""+current_id+"\"\n")
+    
+def connect_exit_to_spine(lab, lab_unsort, exit_number, spine_number, exit_interface_spine, spine_interface_exit): 
+    current_id = get_lan()
+    lab.write("spine"+str(spine_number)+"["+str(spine_interface_exit)+"]=\""+current_id+"\"\n")
+    lab.write("exit"+str(exit_number)+"["+str(exit_interface_spine)+"]=\""+current_id+"\"\n")
+    lab_unsort.write("spine"+str(spine_number)+"["+str(spine_interface_exit)+"]=\""+current_id+"\"\n")
+    lab_unsort.write("exit"+str(exit_number)+"["+str(exit_interface_spine)+"]=\""+current_id+"\"\n")
+    
+def connect_exit_to_exit(lab, lab_unsort, exit1, exit2): 
+    current_id = get_lan()
+    lab.write("exit"+str(exit1)+"[0]=\""+current_id+"\"\n")
+    lab.write("exit"+str(exit2)+"[0]=\""+current_id+"\"\n")
+    lab_unsort.write("exit"+str(exit1)+"[0]=\""+current_id+"\"\n")
+    lab_unsort.write("exit"+str(exit2)+"[0]=\""+current_id+"\"\n")
+      
+    current_id = get_lan()
+    lab.write("exit"+str(exit1)+"[1]=\""+current_id+"\"\n")
+    lab.write("exit"+str(exit2)+"[1]=\""+current_id+"\"\n")
+    lab_unsort.write("exit"+str(exit1)+"[1]=\""+current_id+"\"\n")
+    lab_unsort.write("exit"+str(exit2)+"[1]=\""+current_id+"\"\n")
+
+
 
  # writes the lab.conf file    
 def build_lab_conf( ):
@@ -91,11 +114,13 @@ def build_lab_conf( ):
 
     port_for_spine = 2
     num_pods = 0
+    exit_interface_spine = 2
+    spine_interface_exit = num_leaves + 2
     
     for i in range(num_spine):
         lab.write("spine"+str(i+1)+"[image]=frr \n")
         for j in range(num_leaves): 
-            write_leaf_spine(lab,
+            connect_leaf_to_spine(lab,
                              lab_unsort,
                              port_for_spine,
                              port_for_leaf,
@@ -106,6 +131,17 @@ def build_lab_conf( ):
             port_for_leaf += 1
         port_for_leaf = 2 
         port_for_spine +=1
+        
+        spine_interface_exit = num_leaves + 2
+        for exit_index in range(num_exit):
+            print("connect exit"+str(exit_index+1) + " to spine"+str(i+1))
+            connect_exit_to_spine(lab, lab_unsort, exit_index+1, i+1, exit_interface_spine, spine_interface_exit )
+            if( i == 0): 
+                lab.write("exit"+str(exit_index+1)+"[image]=frr\n")
+            spine_interface_exit += 1
+        exit_interface_spine += 1
+        
+
 
     num_pair_to_connect = num_leaves/2
     start_id = 0
@@ -138,6 +174,11 @@ def build_lab_conf( ):
                                num_spine_to_connect+1,
                                current_id)
         num_spine_to_connect += 2
+    
+    
+    for i in range(int(num_exit/2)): 
+        connect_exit_to_exit(lab, lab_unsort, i+1, i+2)
+
     lab.close()
     lab_unsort.close()
 

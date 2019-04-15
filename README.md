@@ -1,4 +1,4 @@
-# Example of use of BGP in a data center using Katharà 
+# BGP in a data center using Katharà 
 This is an example code for building a data center clos topology that use BGP for routing. 
 
 ## Pre-requisite
