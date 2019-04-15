@@ -13,7 +13,7 @@ You need to build the docker image for katharà containers. Open the lab folder 
 $ docker build -t kathara/frr .
 
 ```
-You also need the pyvis lib for python3. To download it open a terminal and type: 
+You also need the pyvis lib for python3 to visualize the network topology. To download it open a terminal and type: 
 
 ```
 $ python3 -m pip install pyvis
@@ -21,7 +21,7 @@ $ python3 -m pip install pyvis
 ```
 
 ## Run the lab
-To run the lab, type on terminal: 
+To run the lab, go to the lab directory and type on terminal: 
 
 ```
 $ python3 create_lab.py
@@ -39,7 +39,7 @@ $ lclean
 ```
 
 ## Configure the lab
-The number of spines, leaves and servers can be modified editing the buil_net.py file: 
+The number of spines, leaves and servers can be modified editing the build_net.py file: 
 
 ```
 num_leafs = 4 #number of total leaves
