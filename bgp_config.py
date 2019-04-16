@@ -4,24 +4,24 @@ import shutil
 import build_net
 
 num_leaves = build_net.num_leaves
-num_server_pod=build_net.num_server_pod
+num_tor_pod=build_net.num_tor_per_pod
 num_spine=build_net.num_spine
 num_exit = build_net.num_exit
 
 spine_asn = 65499 #starting asn number for spines (the first is 65500)
 leaf_asn = 64999 #starting asn number for leaves (the first is 65000)
-server_asn = 0 #starting asn number for servers (the first is 1)
+tor_asn = 0 #starting asn number for tors (the first is 1)
 
 # variables used to assign router_id
 spine_id=1
 leaf_id=1
-server_id=1
+tor_id=1
 
 # returns a free asn number for the node type of node (node_name)
 def get_asn(node_name):
     global spine_asn
     global leaf_asn
-    global server_asn
+    global tor_asn
   
     asn = None
     if re.search('spine', node_name):
@@ -29,9 +29,9 @@ def get_asn(node_name):
     elif re.search('leaf|exit', node_name): 
         leaf_asn += 1
         asn = leaf_asn
-    elif re.search('server', node_name): 
-        server_asn += 1
-        asn = server_asn
+    elif re.search('tor', node_name): 
+        tor_asn += 1
+        asn = tor_asn
     return asn
 
 # creates all the directory needed in the lab by frr and bgp 
@@ -44,7 +44,7 @@ def create_dir():
                 shutil.rmtree(name)
         
     for item in files:
-        if item.endswith(".startup"):
+        if item.endswith(".startup") and not(re.search("server", item)):
             startup = open(item, "a")
             startup.write("/etc/init.d/frr start\n")
             startup.write("sysctl -w net.ipv4.fib_multipath_hash_policy=1")  #to enable ipv4 multipath 
@@ -127,7 +127,7 @@ def write_leaf_bgpd(leaf_name):
         + " neighbor TOR timers connect 5\n"
     )
     i = num_spine
-    for i in range(num_spine+2, num_spine+2+num_server_pod):
+    for i in range(num_spine+2, num_spine+2+num_tor_pod):
         bgpd_conf.write(
           " neighbor eth"+ str(i) + " interface peer-group TOR\n"  
         )
@@ -174,14 +174,14 @@ def write_exit_bgpd(exit_name):
     leaf_id+=1
     bgpd_conf.close()
 
-# writes the server (server_name) bgpd.conf file
-def write_server_bgpd(server_name):
-    global server_id
-    bgpd_conf=open(server_name+"/etc/frr/bgpd.conf", "a")
-    asn = get_asn(server_name)
+# writes the tor (tor_name) bgpd.conf file
+def write_tor_bgpd(tor_name):
+    global tor_id
+    bgpd_conf=open(tor_name+"/etc/frr/bgpd.conf", "a")
+    asn = get_asn(tor_name)
     bgpd_conf.write(
         "router bgp " + str(asn) + "\n"
-        + " bgp router-id " + str(server_id)+"."+str(server_id)+"."+str(server_id)+"."+str(server_id) +"\n"
+        + " bgp router-id " + str(tor_id)+"."+str(tor_id)+"."+str(tor_id)+"."+str(tor_id) +"\n"
         + "timers bgp 3 9\n" )
     bgpd_conf.write(
         " neighbor TOR peer-group\n"
@@ -198,10 +198,11 @@ def write_server_bgpd(server_name):
         " bgp bestpath as-path multipath-relax\n"
         + "  address-family ipv4 unicast\n"
         + "  neighbor TOR activate\n" 
+        + "  redistribute connected\n" 
         + "  maximum-paths 64\n"
         + " exit-address-family\n"
     )
-    server_id+=1
+    tor_id+=1
     bgpd_conf.close()
 
 # writes all the bgpd.conf files
@@ -217,7 +218,7 @@ def write_all_config():
     for i in range(1, num_exit+1): 
         write_exit_bgpd("exit"+str(i))
 
-    number_of_server = num_server_pod * int((num_leaves/2))
-    for i in range(1, number_of_server+1):     
-        write_server_bgpd("server"+str(i))
+    number_of_tor = num_tor_pod * int((num_leaves/2))
+    for i in range(1, number_of_tor+1):     
+        write_tor_bgpd("tor"+str(i))
     

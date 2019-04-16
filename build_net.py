@@ -3,10 +3,12 @@ import string
 
 
 num_leaves = 4  #number of leaves 
-num_server_pod = 2 #number of server per pod (a pod is made by two leaves)
+num_tor_per_pod = 2 #number of tor per pod (a pod is made by two leaves)
 num_spine = 2 #number of spine
 num_exit = 2
-
+num_server_per_tor = 3
+num_server = int(num_server_per_tor * (num_leaves/2))
+num_tor = int(num_tor_per_pod * (num_leaves/2))
 # 0 and 1 for connection 
 start_port = 2
 current_id = "@"
@@ -49,19 +51,19 @@ def connect_leaves(lab,lab_unsort,leaf_number,current_id):
     lab_unsort.write("leaf"+str(leaf_number)+"[1]=\""+current_id+"\"\n")
     lab_unsort.write("leaf"+str(leaf_number+1)+"[1]=\""+current_id+"\"\n")
 
-# connects a server (server_number) to a pair of leaves (leaf_number and leaf_number+1) on leaf_interface
-def connect_server_to_leaf(lab,lab_unsort,server_number,leaf_number,current_id,leaf_interface):
+# connects a tor (tor_number) to a pair of leaves (leaf_number and leaf_number+1) on leaf_interface
+def connect_tor_to_leaf(lab,lab_unsort,tor_number,leaf_number,current_id,leaf_interface):
     current_id = get_lan()
-    lab.write("server"+str(server_number)+"[0]=\""+current_id+"\"\n")
-    lab.write("server"+str(server_number)+"[image]=frr\n")
+    lab.write("tor"+str(tor_number)+"[0]=\""+current_id+"\"\n")
+    lab.write("tor"+str(tor_number)+"[image]=frr\n")
     lab.write("leaf"+str(leaf_number)+"["+str(leaf_interface)+"]=\""+current_id+"\"\n")
     lab_unsort.write("leaf"+str(leaf_number)+"["+str(leaf_interface)+"]=\""+current_id+"\"\n")
-    lab_unsort.write("server"+str(server_number)+"[0]=\""+current_id+"\"\n")
+    lab_unsort.write("tor"+str(tor_number)+"[0]=\""+current_id+"\"\n")
 
     current_id = get_lan()
-    lab.write("server"+str(server_number)+"[1]=\""+current_id+"\"\n")
+    lab.write("tor"+str(tor_number)+"[1]=\""+current_id+"\"\n")
     lab.write("leaf"+str(leaf_number+1)+"["+str(leaf_interface)+"]=\""+current_id+"\"\n")
-    lab_unsort.write("server"+str(server_number)+"[1]=\""+current_id+"\"\n")
+    lab_unsort.write("tor"+str(tor_number)+"[1]=\""+current_id+"\"\n")
     lab_unsort.write("leaf"+str(leaf_number+1)+"["+str(leaf_interface)+"]=\""+current_id+"\"\n")
 
 # connects two spine each other (spine_number and spine_number + 1)
@@ -98,7 +100,14 @@ def connect_exit_to_exit(lab, lab_unsort, exit1, exit2):
     lab_unsort.write("exit"+str(exit1)+"[1]=\""+current_id+"\"\n")
     lab_unsort.write("exit"+str(exit2)+"[1]=\""+current_id+"\"\n")
 
+def connect_server_to_tor(lab, lab_unsort, server_number, server_lan): 
+    lab.write("server"+str(server_number)+"[0]=\""+server_lan+"\"\n")
+    lab_unsort.write("server"+str(server_number)+"[0]=\""+server_lan+"\"\n")
+    
 
+def create_tor_interface_to_servers(lab, lab_unsort, tor_number, tor_interface_to_servers, server_lan): 
+    lab.write("tor"+str(tor_number)+"["+str(tor_interface_to_servers)+"]=\""+server_lan+"\"\n")
+    lab_unsort.write("tor"+str(tor_number)+"["+str(tor_interface_to_servers)+"]=\""+server_lan+"\"\n")
 
  # writes the lab.conf file    
 def build_lab_conf( ):
@@ -134,7 +143,7 @@ def build_lab_conf( ):
         
         spine_interface_exit = num_leaves + 2
         for exit_index in range(num_exit):
-            print("connect exit"+str(exit_index+1) + " to spine"+str(i+1))
+            #print("connect exit"+str(exit_index+1) + " to spine"+str(i+1))
             connect_exit_to_spine(lab, lab_unsort, exit_index+1, i+1, exit_interface_spine, spine_interface_exit )
             if( i == 0): 
                 lab.write("exit"+str(exit_index+1)+"[image]=frr\n")
@@ -152,20 +161,32 @@ def build_lab_conf( ):
                       current_id)
         start_id+=2
 
-    num_build_server = 0
+    num_build_tor = 0
     for j in range(int(num_leaves/2)):
-        port_for_server = port_for_spine
-        for k in range(num_server_pod):
-            connect_server_to_leaf(lab,
+        port_for_tor = port_for_spine
+        for k in range(num_tor_per_pod):
+            connect_tor_to_leaf(lab,
                                    lab_unsort,
-                                   num_build_server+1,
+                                   num_build_tor+1,
                                    num_pods+1,
                                    current_id,
-                                   port_for_server)
+                                   port_for_tor)
            
-            port_for_server += 1
-            num_build_server += 1
+            port_for_tor += 1
+            num_build_tor += 1
         num_pods+=2
+
+    
+    server_index = 1
+    
+    for tor_index in range(int(num_tor_per_pod*(num_leaves/2))):
+        print(tor_index)
+        tor_interface_to_servers = 2
+        server_lan = get_lan()
+        create_tor_interface_to_servers(lab, lab_unsort, tor_index+1, tor_interface_to_servers,  server_lan)
+        for server in range(num_server_per_tor):            
+            connect_server_to_tor(lab, lab_unsort, server_index, server_lan)
+            server_index += 1
     
     num_spine_to_connect = 0
     for i in range(int(num_spine/2)):
