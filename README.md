@@ -1,11 +1,17 @@
 # BGP in a data center using Katharà 
-This is an example code for building a data center clos topology that use BGP for routing. 
+This is an example code for building a data center 3-tier clos topology with single-attached servers, that use BGP for routing.
+
 
 ## Pre-requisite
 
 To run the example lab in this repository, you'll need katharà: 
  
 https://github.com/KatharaFramework/Kathara
+
+N.B. : Keep update your katharà version! See: 
+
+https://github.com/KatharaFramework/Kathara/wiki/Update
+
 
 You need to build the docker image for katharà containers. Open the lab folder in a terminal and type: 
 
@@ -74,8 +80,8 @@ Password:
 
 root@spine1:/# frr
 
-frr> show ip bgp 
-BGP table version is 32, local router ID is 10.0.255.1, vrf id 0
+frr> show ip bgp
+BGP table version is 38, local router ID is 10.0.255.1, vrf id 0
 Default local pref 100, local AS 65499
 Status codes:  s suppressed, d damped, h history, * valid, > best, = multipath,
                i internal, r RIB-failure, S Stale, R Removed
@@ -91,38 +97,57 @@ Origin codes:  i - IGP, e - EGP, ? - incomplete
 *>                  0.0.0.0                  0         32768 ?
 *  10.0.0.12/30     10.0.0.13                0             0 65003 ?
 *>                  0.0.0.0                  0         32768 ?
-*> 10.0.0.16/30     10.0.0.1                 0             0 65000 ?
-*> 10.0.0.20/30     10.0.0.5                 0             0 65001 ?
-*> 10.0.0.24/30     10.0.0.9                 0             0 65002 ?
-*> 10.0.0.28/30     10.0.0.13                0             0 65003 ?
-*= 10.0.0.32/30     10.0.0.5                 0             0 65001 ?
+*  10.0.0.16/30     10.0.0.18                0             0 65004 ?
+*>                  0.0.0.0                  0         32768 ?
+*  10.0.0.20/30     10.0.0.22                0             0 65005 ?
+*>                  0.0.0.0                  0         32768 ?
+*> 10.0.0.24/30     10.0.0.1                 0             0 65000 ?
+*> 10.0.0.28/30     10.0.0.5                 0             0 65001 ?
+*> 10.0.0.32/30     10.0.0.9                 0             0 65002 ?
+*> 10.0.0.36/30     10.0.0.13                0             0 65003 ?
+*> 10.0.0.40/30     10.0.0.18                0             0 65004 ?
+*> 10.0.0.44/30     10.0.0.22                0             0 65005 ?
+*= 10.0.0.48/30     10.0.0.5                 0             0 65001 ?
 *>                  10.0.0.1                 0             0 65000 ?
-*= 10.0.0.36/30     10.0.0.5                 0             0 65001 ?
+*= 10.0.0.52/30     10.0.0.5                 0             0 65001 ?
 *>                  10.0.0.1                 0             0 65000 ?
-*> 10.0.0.40/30     10.0.0.9                 0             0 65002 ?
+*> 10.0.0.56/30     10.0.0.9                 0             0 65002 ?
 *=                  10.0.0.13                0             0 65003 ?
-*> 10.0.0.44/30     10.0.0.9                 0             0 65002 ?
+*> 10.0.0.60/30     10.0.0.9                 0             0 65002 ?
 *=                  10.0.0.13                0             0 65003 ?
-*  10.0.0.48/30     10.0.0.5                               0 65001 1 65000 ?
+*  10.0.0.64/30     10.0.0.5                               0 65001 1 ?
 *>                  10.0.0.1                 0             0 65000 ?
-*> 10.0.0.52/30     10.0.0.5                 0             0 65001 ?
-*                   10.0.0.1                               0 65000 1 65001 ?
-*  10.0.0.56/30     10.0.0.5                               0 65001 1 65000 ?
+*  10.0.0.68/30     10.0.0.1                               0 65000 1 ?
+*>                  10.0.0.5                 0             0 65001 ?
+*  10.0.0.72/30     10.0.0.5                               0 65001 2 ?
 *>                  10.0.0.1                 0             0 65000 ?
-*> 10.0.0.60/30     10.0.0.5                 0             0 65001 ?
-*                   10.0.0.1                               0 65000 1 65001 ?
-*> 10.0.0.64/30     10.0.0.9                 0             0 65002 ?
-*                   10.0.0.13                              0 65003 3 65002 ?
-*  10.0.0.68/30     10.0.0.9                               0 65002 3 65003 ?
+*  10.0.0.76/30     10.0.0.1                               0 65000 2 ?
+*>                  10.0.0.5                 0             0 65001 ?
+*  10.0.0.80/30     10.0.0.13                              0 65003 3 ?
+*>                  10.0.0.9                 0             0 65002 ?
+*  10.0.0.84/30     10.0.0.9                               0 65002 3 ?
 *>                  10.0.0.13                0             0 65003 ?
-*> 10.0.0.72/30     10.0.0.9                 0             0 65002 ?
-*                   10.0.0.13                              0 65003 3 65002 ?
-*  10.0.0.76/30     10.0.0.9                               0 65002 3 65003 ?
+*  10.0.0.88/30     10.0.0.13                              0 65003 4 ?
+*>                  10.0.0.9                 0             0 65002 ?
+*  10.0.0.92/30     10.0.0.9                               0 65002 4 ?
 *>                  10.0.0.13                0             0 65003 ?
-*> 10.0.0.80/30     0.0.0.0                  0         32768 ?
-*> 10.0.0.84/30     0.0.0.0                  0         32768 ?
+*> 10.0.0.96/30     0.0.0.0                  0         32768 ?
+*> 10.0.0.100/30    0.0.0.0                  0         32768 ?
+*= 10.0.0.104/30    10.0.0.22                0             0 65005 ?
+*>                  10.0.0.18                0             0 65004 ?
+*= 10.0.0.108/30    10.0.0.22                0             0 65005 ?
+*>                  10.0.0.18                0             0 65004 ?
+*= 200.0.0.0/24     10.0.0.5                               0 65001 1 ?
+*>                  10.0.0.1                               0 65000 1 ?
+*= 200.0.1.0/24     10.0.0.5                               0 65001 2 ?
+*>                  10.0.0.1                               0 65000 2 ?
+*> 200.0.2.0/24     10.0.0.9                               0 65002 3 ?
+*=                  10.0.0.13                              0 65003 3 ?
+*> 200.0.3.0/24     10.0.0.9                               0 65002 4 ?
+*=                  10.0.0.13                              0 65003 4 ?
 
-Displayed  22 routes and 38 total paths
+Displayed  32 routes and 56 total paths
+
 
 ```
 
@@ -130,9 +155,36 @@ You can notice that bgp multipath is working (the '=' means that the routes to t
 If you want to check that also the data plane detects multipath routes, type on spine1 terminal (outside the bgp daemon): 
 
 ```
-root@spine1:/# ip route show 10.0.0.40/30
-10.0.0.40/30 proto bgp metric 20 
-        nexthop via 10.0.0.9 dev eth4 weight 1 
-        nexthop via 10.0.0.13 dev eth5 weight 1 
+root@spine1:/# ip route show 200.0.0.1/24
+200.0.0.0/24 proto bgp metric 20 
+        nexthop via 10.0.0.1 dev eth2 weight 1 
+        nexthop via 10.0.0.5 dev eth3 weight 1 
 ```
 
+## Verify High Availability
+
+Using a routing protocol such as BGP or OSPF means that as long as one spine is still running, the network will automatically learn a new route and keep the fabric connected. This means that you can do rolling upgrades one spine at a time without incurring any downtime.
+
+Open server1 terminal, and use traceroute to verify the path to server10 (200.0.3.2 if you use the default configuration) :
+
+```
+
+root@server1:/# traceroute 200.0.3.2
+traceroute to 200.0.3.2 (200.0.3.2), 30 hops max, 60 byte packets
+ 1  200.0.0.1 (200.0.0.1)  0.094 ms  0.026 ms  0.019 ms
+ 2  10.0.0.65 (10.0.0.65)  0.056 ms 10.0.0.70 (10.0.0.70)  0.045 ms 10.0.0.65 (10.0.0.65)  0.027 ms
+ 3  10.0.0.2 (10.0.0.2)  0.052 ms 10.0.0.30 (10.0.0.30)  0.104 ms 10.0.0.2 (10.0.0.2)  0.088 ms
+ 4  10.0.0.37 (10.0.0.37)  0.060 ms 10.0.0.9 (10.0.0.9)  0.046 ms 10.0.0.37 (10.0.0.37)  0.043 ms
+ 5  10.0.0.90 (10.0.0.90)  0.078 ms  0.052 ms  0.049 ms
+ 6  200.0.3.2 (200.0.3.2)  0.137 ms  0.212 ms  0.112 ms
+
+```
+
+Try to ping from server1 to server10. While the ping is running, open leaf1 terminal and shutdown its eth4 (the one connected to tor1, the ToR of server1):
+
+```
+root@leaf1:/# ifconfig eth4 down
+
+```
+
+you can notice that the ping stops for a while, and then restarts! 

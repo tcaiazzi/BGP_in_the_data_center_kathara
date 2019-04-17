@@ -63,6 +63,7 @@ def create_dir():
                     + "password frr\n"
                     + "enable password frr\n"
                 )
+                write_route_map(bgpd)
                 bgpd.close()
                 daemons.close()
             elif re.search("server", item):
@@ -73,7 +74,15 @@ def create_dir():
                 index.write("<html><body>This response comes from " + name + "</body></html>")
                 index.close()
             startup.close()
-            
+
+
+def write_route_map(bgp_conf): 
+    bgp_conf.write("\n\n" +
+    "ip prefix-list DC_LOCAL_SUBNET 5 permit 10.0.0.0/16 le 26\n"
+    + "ip prefix-list DC_LOCAL_SUBNET 10 permit 200.0.0.0/16 le 32\n"
+    + "route-map ACCEPT_DC_LOCAL permit 10\n"
+    + " match ip-address DC_LOCAL_SUBNET\n\n\n"
+    )
 
 # writes the spine (spine_name) bgpd.conf file
 def write_spine_bgpd(spine_name):
@@ -100,7 +109,7 @@ def write_spine_bgpd(spine_name):
     bgpd_conf.write(
         " address-family ipv4 unicast\n"
         + "  neighbor fabric activate\n"
-        + "  redistribute connected\n" 
+        + "  redistribute connected route-map ACCEPT_DC_LOCAL\n" 
         + "  maximum-paths 64\n"
         + " exit-address-family\n"
     )
@@ -143,7 +152,7 @@ def write_leaf_bgpd(leaf_name):
         " address-family ipv4 unicast\n"
         + "  neighbor ISL activate\n"
         + "  neighbor TOR activate\n"
-        + "  redistribute connected\n" 
+        + "  redistribute connected route-map ACCEPT_DC_LOCAL\n" 
         + "  maximum-paths 64\n"
         + " exit-address-family\n"
     )
@@ -175,7 +184,7 @@ def write_exit_bgpd(exit_name):
     bgpd_conf.write(
         " address-family ipv4 unicast\n"
         + "  neighbor fabric activate\n"
-        + "  redistribute connected\n" 
+        + "  redistribute connected route-map ACCEPT_DC_LOCAL\n" 
         + "  maximum-paths 64\n"
         + " exit-address-family\n"
     )
@@ -206,7 +215,7 @@ def write_tor_bgpd(tor_name):
         " bgp bestpath as-path multipath-relax\n"
         + "  address-family ipv4 unicast\n"
         + "  neighbor TOR activate\n" 
-        + "  redistribute connected\n" 
+        + "  redistribute connected route-map ACCEPT_DC_LOCAL\n" 
         + "  maximum-paths 64\n"
         + " exit-address-family\n"
     )
