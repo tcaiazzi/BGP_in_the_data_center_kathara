@@ -109,6 +109,8 @@ def create_tor_interface_to_servers(lab, lab_unsort, tor_number, tor_interface_t
     lab.write("tor"+str(tor_number)+"["+str(tor_interface_to_servers)+"]=\""+server_lan+"\"\n")
     lab_unsort.write("tor"+str(tor_number)+"["+str(tor_interface_to_servers)+"]=\""+server_lan+"\"\n")
 
+
+
  # writes the lab.conf file    
 def build_lab_conf( ):
     print("Building the lab configuration ...")
@@ -180,7 +182,7 @@ def build_lab_conf( ):
     server_index = 1
     
     for tor_index in range(int(num_tor_per_pod*(num_leaves/2))):
-        print(tor_index)
+        #print(tor_index)
         tor_interface_to_servers = 2
         server_lan = get_lan()
         create_tor_interface_to_servers(lab, lab_unsort, tor_index+1, tor_interface_to_servers,  server_lan)
@@ -196,10 +198,11 @@ def build_lab_conf( ):
                                current_id)
         num_spine_to_connect += 2
     
-    
+    exit_index = 1
     for i in range(int(num_exit/2)): 
-        connect_exit_to_exit(lab, lab_unsort, i+1, i+2)
-
+        connect_exit_to_exit(lab, lab_unsort, exit_index, exit_index+1)
+        exit_index += 2
+        
     lab.close()
     lab_unsort.close()
 

@@ -39,32 +39,40 @@ def create_dir():
     files = os.listdir('.')
     for item in files:
         if item.endswith(".startup"):
-            name = re.split('\.startup', item)[0]
+            name = re.split(r'\.startup', item)[0]
             if os.path.exists(name): 
                 shutil.rmtree(name)
         
     for item in files:
-        if item.endswith(".startup") and not(re.search("server", item)):
+        if item.endswith(".startup"):
             startup = open(item, "a")
-            startup.write("/etc/init.d/frr start\n")
-            startup.write("sysctl -w net.ipv4.fib_multipath_hash_policy=1")  #to enable ipv4 multipath 
-            name = re.split('\.startup', item)[0]
-           
-            os.mkdir(name)
-            os.mkdir(name+"/etc")
-            os.mkdir(name+"/etc/frr")
-            daemons = open(name+"/etc/frr/daemons", "w")
-            daemons.write("zebra=yes\n")
-            daemons.write("bgpd=yes\n")
-            bgpd = open(name+"/etc/frr/bgpd.conf", "w")
-            bgpd.write(
-                  "hostname frr\n"
-                + "password frr\n"
-                + "enable password frr\n"
-            )
+            name = re.split(r'\.startup', item)[0]
+            if not(re.search("server", item)):
+                #print("no server: "+item)
+                startup.write("/etc/init.d/frr start\n")
+                startup.write("sysctl -w net.ipv4.fib_multipath_hash_policy=1\n")  #to enable ipv4 multipath 
+                os.mkdir(name)
+                os.mkdir(name+"/etc")
+                os.mkdir(name+"/etc/frr")
+                daemons = open(name+"/etc/frr/daemons", "w")
+                daemons.write("zebra=yes\n")
+                daemons.write("bgpd=yes\n")
+                bgpd = open(name+"/etc/frr/bgpd.conf", "w")
+                bgpd.write(
+                    "hostname frr\n"
+                    + "password frr\n"
+                    + "enable password frr\n"
+                )
+                bgpd.close()
+                daemons.close()
+            elif re.search("server", item):
+                #print(item)
+                startup.write("/etc/init.d/apache2 start\n")
+                os.makedirs(name+"/var/www/html")
+                index =  open(name+"/var/www/html/index.html", "w")
+                index.write("<html><body>This response comes from " + name + "</body></html>")
+                index.close()
             startup.close()
-            bgpd.close()
-            daemons.close()
             
 
 # writes the spine (spine_name) bgpd.conf file

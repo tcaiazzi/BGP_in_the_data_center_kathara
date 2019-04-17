@@ -23,10 +23,10 @@ initial_x_tor = 200
 initial_y_tor = 650
 initial_x_leaves = 200
 initial_y_leaves = 450
-initial_x_spine = 400
-initial_y_spine = 0
+initial_x_spine = 350
+initial_y_spine = 200
 initial_x_exit = initial_x_spine
-initial_y_exit = -200
+initial_y_exit = 0
 initial_x_server = initial_x_tor +150
 initial_y_server =  initial_y_tor 
 server_y = initial_y_server
@@ -53,7 +53,7 @@ def set_positions(name_n, positions_list):
         initial_x_leaves += 150
         positions_list[name_n] = (initial_x_leaves,initial_y_leaves)
     elif re.search("spine",  name_n): 
-        number = int(re.split('spine|\[|\]=.*', name_n)[1]) 
+        number = int(re.split(r'spine|\[|\]=.*', name_n)[1]) 
         
         if number > 2 and number % 2 == 1: 
             initial_x_spine +=  350
@@ -65,17 +65,20 @@ def set_positions(name_n, positions_list):
         initial_x_tor += 150
         positions_list[name_n] = (initial_x_tor,initial_y_tor)
     elif re.search("exit", name_n): 
-        initial_x_exit +=  150
+        number = int(re.split(r'exit|\[|\]=.*', name_n)[1]) 
+        if number > 2 and number % 2 == 1: 
+            initial_x_exit +=  350
+        else: 
+            initial_x_exit += 150
         positions_list[name_n] = (initial_x_exit, initial_y_exit)
     elif re.search("server", name_n): 
-        current_server_number = int(re.split("server|\[|\]", name_n)[1])
-        print(current_server_number)
+        current_server_number = int(re.split(r"server|\[|\]", name_n)[1])
         server_y += 100
         positions_list[name_n] = (initial_x_server, server_y)    
         if (current_server_number % num_server_per_tor == 0) : 
             initial_x_server += 150
             server_y = initial_y_server
-            print("new tor")
+        
 
 # returns two free ip addresses and their lan
 def get_ip(): 
@@ -109,10 +112,10 @@ def get_image(name):
 
 def skip_line(fp):
     line = fp.readline().strip()
-    while re.search("tor[0-9]*\[2\]|server", line):
-        print("skip line: " + line)
+    while re.search(r"tor[0-9]*\[2\]|server", line):
+        #print("skip line: " + line)
         line = fp.readline().strip()
-    print(line)
+    #print(line)
     return line
 
 
@@ -152,7 +155,7 @@ def server_ipconfig():
             server_ip = server_net + str(server_index+2)
             server_startup = open("server"+str(current_server)+".startup", "a")
             server_startup.write("ifconfig eth0 "+ server_ip +"/24 up\n")
-            server_startup.write("route add default gw "+tor_ip)
+            server_startup.write("route add default gw "+tor_ip+"\n")
             add_server_lan_to_graph(current_server, tor_index, server_net, server_ip)
             server_startup.close()
             current_server += 1
