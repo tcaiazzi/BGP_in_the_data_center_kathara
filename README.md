@@ -59,7 +59,7 @@ N.B. : we test only configuration with an even number of leaves and spines.
 
 
 ## Examine the behaviour of BGP 
-You can examine how BGP works in the lab. For example, if you run the lab with default configuration (2 spines, 4 leaves, 4 servers), open the spine1 terminal and type: 
+You can examine how BGP works in the lab. For example, if you run the lab with default configuration (2 spines, 4 leaves, 4 ToRs, 12 servers), open the spine1 terminal and type: 
 
 
 ```
