@@ -5,8 +5,9 @@ import string
 num_leaves = 4  #number of leaves 
 num_tor_per_pod = 2 #number of tor per pod (a pod is made by two leaves)
 num_spine = 2 #number of spine
-num_exit = 2
-num_server_per_tor = 3
+num_exit = 2  #number of exit nodes
+num_server_per_tor = 3 #number of servers for each ToR
+
 num_server = int(num_server_per_tor * (num_leaves/2))
 num_tor = int(num_tor_per_pod * (num_leaves/2))
 # 0 and 1 for connection 
