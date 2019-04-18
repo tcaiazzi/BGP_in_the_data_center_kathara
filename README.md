@@ -45,12 +45,14 @@ $ lclean
 ```
 
 ## Configure the lab
-The number of spines, leaves and servers can be modified editing the build_net.py file: 
+The number of spines, leaves, ToRs and servers can be modified editing the build_net.py file: 
 
 ```
-num_leafs = 4 #number of total leaves
-num_server_pod = 2 #number of servers per pod (two leaves are considered a pod)
-num_spine = 2 #number of spines
+num_leaves = 4  #number of leaves 
+num_tor_per_pod = 2 #number of tor per pod (a pod is made by two leaves)
+num_spine = 2 #number of spine
+num_exit = 2  #number of exit nodes
+num_server_per_tor = 3 #number of servers for each ToR
 
 ```
 After, you'll need to run create_lab.py.
