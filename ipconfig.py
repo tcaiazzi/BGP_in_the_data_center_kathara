@@ -137,11 +137,16 @@ def  add_server_lan_to_graph(server_index, tor_index, server_net, server_ip):
     set_positions(server_name, positions_list)
     curr_posx,curr_posy = positions_list[server_name]
     image = get_image(server_name)
-    clos_net.add_node(transparent_node_name,"",title="",shape="image",physics=False, x=curr_posx, y=curr_posy,image="transparent.png", hidden=True)
-    clos_net.add_edge(transparent_node_name,tor_name, width=(0.1), title=server_net)
-    clos_net.add_node(server_name,server_name,title=server_name+" neighbors:<br><br>",shape="image",physics=False, x=curr_posx - 100, y=curr_posy,image=image)
-    clos_net.add_edge(transparent_node_name,server_name, width=(0.1), title=server_net)
-    
+    if server_index % 3 == 1 : 
+        clos_net.add_node(transparent_node_name,"",title="",shape="image",physics=False, x=curr_posx, y=curr_posy,image="transparent.png", hidden=True)
+        clos_net.add_edge(transparent_node_name,tor_name, width=(0.1), title=server_net)
+        clos_net.add_node(server_name,server_name,title=server_name+" neighbors:<br><br>",shape="image",physics=False, x=curr_posx - 100, y=curr_posy,image=image)
+        clos_net.add_edge(transparent_node_name,server_name, width=(0.1), title=server_net)
+    else : 
+        clos_net.add_node(transparent_node_name,"",title="",shape="image",physics=False, x=curr_posx, y=curr_posy,image="transparent.png", hidden=True)
+        clos_net.add_edge(transparent_node_name,"transparent"+str(server_index-1), width=(0.1), title=server_net)
+        clos_net.add_node(server_name,server_name,title=server_name+" neighbors:<br><br>",shape="image",physics=False, x=curr_posx - 100, y=curr_posy,image=image)
+        clos_net.add_edge(transparent_node_name,server_name, width=(0.1), title=server_net)
 
 
 
