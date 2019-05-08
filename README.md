@@ -1,6 +1,8 @@
 # BGP in a data center using Katharà 
 This is an example code for building a data center 3-tier clos topology with single-attached servers, that use BGP for routing.
 
+All the nodes in the network use FFRouting: 
+https://frrouting.org/
 
 ## Pre-requisite
 

@@ -63,8 +63,16 @@ def create_dir():
                     + "password frr\n"
                     + "enable password frr\n"
                 )
+                zebra = open(name+"/etc/frr/zebra.conf", "w")
+                zebra.write(
+                    "hostname frr\n"
+                    + "password frr\n"
+                    + "enable password frr\n"
+                )
+
                 write_route_map(bgpd)
                 bgpd.close()
+                zebra.close()
                 daemons.close()
             elif re.search("server", item):
                 #print(item)
